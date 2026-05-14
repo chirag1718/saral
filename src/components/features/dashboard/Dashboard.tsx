@@ -5,19 +5,19 @@ const featureCards = [
         title: "Reward Your Ambassadors",
         description:
             "Boost campaign performance by setting up rewards for ambassadors",
-        image: "./dashboard-card-gift.svg",
+        image: "./dashboard/card-gift.svg",
     },
     {
         title: "Set Milestones",
         description:
             "Set up custom goals for sales, posts, or time-based achievements",
-        image: "./dashboard-card-crown.svg",
+        image: "./dashboard/card-crown.svg",
     },
     {
         title: "Customise Incentives",
         description:
             "Create custom incentives like flat fees, free products, or special commissions.",
-        image: "./dashboard-card-ticket-sale.svg",
+        image: "./dashboard/card-ticket-sale.svg",
     },
 ]
 
@@ -26,7 +26,7 @@ const Dashboard = () => {
         <div className="w-full h-full max-w-5xl py-9">
             <div className="flex flex-col items-start justify-normal h-fit gap-10 relative">
                 <img
-                    src="./dash-grid.png"
+                    src="./dashboard/bg-grid.png"
                     alt="Dashboard Image"
                     className="w-full h-48 sm:h-64 md:h-80 object-cover rounded-2xl border"
                 />
@@ -52,7 +52,7 @@ const Dashboard = () => {
                                 className="relative h-55 w-73 flex flex-col items-center justify-center gap-4 overflow-hidden rounded-md border border-secondary text-center bg-white/95 p-6 shadow-[0px_15px_42px_-16px_rgba(0,0,0,0.1)]"
                             >
                                 <img
-                                    src="./dash-card-waves.png"
+                                    src="./dashboard/card-bg-waves.png"
                                     alt=""
                                     className="absolute w-full h-auto object-cover left-0 top-0"
                                 />
