@@ -1,4 +1,7 @@
 import { Button } from "../../ui/button"
+import { useAppDispatch } from "@/store/store"
+import { openModal } from "@/store/rewardSlice"
+import { RewardSystemModal } from "./RewardSystemModal"
 
 const featureCards = [
     {
@@ -22,6 +25,8 @@ const featureCards = [
 ]
 
 const Dashboard = () => {
+    const dispatch = useAppDispatch()
+
     return (
         <div className="w-full h-full max-w-5xl py-9">
             <div className="flex flex-col items-start justify-normal h-fit gap-10 relative">
@@ -39,7 +44,11 @@ const Dashboard = () => {
                             Enable gamification to start crafting <br /> your custom reward system.
                         </p>
                     </div>
-                    <Button variant="default" className="px-8 sm:px-20 w-full sm:w-auto max-w-xs">
+                    <Button
+                        variant="default"
+                        className="px-8 sm:px-20 w-full sm:w-auto max-w-xs"
+                        onClick={() => dispatch(openModal())}
+                    >
                         Enable Gamification
                     </Button>
                 </div>
@@ -73,8 +82,10 @@ const Dashboard = () => {
                         )
                     })}
                 </div>
-
             </div>
+
+            {/* Modal is rendered here, visibility controlled by Redux isOpen */}
+            <RewardSystemModal />
         </div>
     )
 }
