@@ -31,6 +31,7 @@ export function RewardWithSelect() {
     rewardSaved,
     rewardDropOpen,
     bonusVal,
+    eventKey,
   } = useAppSelector((s) => s.reward);
 
   const bonusInputRef = useRef<HTMLInputElement>(null);
@@ -42,11 +43,10 @@ export function RewardWithSelect() {
   }, [rewardKey, rewardSaved]);
 
   const bonusSaveDisabled = !bonusVal || Number(bonusVal) <= 0;
+  const isCommissionDisabled = eventKey === "onboard";
 
-  // Three-state trigger label:
-  // null key          -> placeholder
-  // key set, unsaved  -> raw option label
-  // saved             -> resolved label from slice (e.g. "Upgrade to Bronze tier")
+  const showBonusInput = rewardKey === "bonus" && !rewardSaved;
+
   const triggerLabel = !rewardKey
     ? null
     : rewardSaved
@@ -90,16 +90,11 @@ export function RewardWithSelect() {
           <Command>
             <CommandList className="max-h-none">
               {REWARD_OPTIONS.map((opt) => {
-                // For commission, show the saved label in the list once saved
                 const listLabel =
                   opt.key === "commission" && rewardSaved && rewardKey === "commission"
                     ? rewardLabel
                     : opt.label;
 
-                // A checkmark should show when this option is the saved selection.
-                // For commission: rewardKey === "commission" AND rewardSaved.
-                // For bonus: rewardKey === "bonus" (saved check is implicitly
-                //   handled by the inline input being hidden when rewardSaved).
                 const isSelected =
                   rewardKey === opt.key &&
                   (opt.key === "commission" ? rewardSaved : true);
@@ -110,13 +105,11 @@ export function RewardWithSelect() {
                       value={opt.key ?? ""}
                       onSelect={() => {
                         if (opt.key === "commission") {
-                          // Always open the tier dialog for commission -
-                          // whether first time or editing
+                          if (isCommissionDisabled) return;
                           dispatch(closeRewardDrop());
                           dispatch(openCommissionTierDialog());
                           return;
                         }
-                        // Bonus: if already saved with this key, just close
                         if (rewardSaved && rewardKey === opt.key) {
                           dispatch(closeRewardDrop());
                           return;
@@ -126,12 +119,12 @@ export function RewardWithSelect() {
                       className={cn(
                         "px-3 py-2 cursor-pointer text-sm mb-1 group",
                         "data-[selected=true]:bg-accent hover:text-primary",
-                        isSelected && "text-primary"
+                        isSelected && "text-primary bg-accent",
+                        isCommissionDisabled && opt.key === "commission" && "opacity-50 cursor-not-allowed"
                       )}
                     >
                       <div className="flex items-center justify-normal gap-1">
                         <p>{listLabel}</p>
-                        {/* Edit icon for commission on hover when saved */}
                         {opt.key === "commission" &&
                           rewardSaved &&
                           rewardKey === "commission" && (
@@ -139,60 +132,56 @@ export function RewardWithSelect() {
                           )}
                       </div>
                       <CommandShortcut className="flex items-center justify-end gap-2">
-                        {/* Checkmark for selected option */}
-                        {isSelected && (
-                          <Check className="size-4 text-primary" />
-                        )}
+                        {isSelected && <Check className="size-4 text-primary" />}
                       </CommandShortcut>
                     </CommandItem>
 
-                    {/* Inline input for "bonus" only */}
-                    {opt.key === "bonus" &&
-                      rewardKey === "bonus" &&
-                      !rewardSaved && (
-                        <div className="bg-muted/40 px-3 pb-3 pt-1 space-y-2">
-                          <div className="relative">
-                            <div className="flex items-center justify-center h-7.5 w-fit -translate-y-1/2 absolute top-1/2 left-0 px-2 border-r rounded-l border-gray-200">
-                              <DollarSign className="size-3.5 text-muted-foreground" />
-                            </div>
-                            <Input
-                              ref={bonusInputRef}
-                              type="number"
-                              placeholder="e.g. 50"
-                              value={bonusVal}
-                              onChange={(e) =>
-                                dispatch(setBonusVal(e.target.value))
-                              }
-                              className="h-8 pl-10 text-sm focus-visible:ring-1 focus-visible:ring-primary"
-                            />
+                    {/* Bonus input only - no buttons */}
+                    {opt.key === "bonus" && showBonusInput && (
+                      <div className="bg-muted/40 px-3 pb-3 pt-1">
+                        <div className="relative">
+                          <div className="flex items-center justify-center h-7.5 w-fit -translate-y-1/2 absolute top-1/2 left-0 px-2 border-r rounded-l border-gray-200">
+                            <DollarSign className="size-3.5 text-muted-foreground" />
                           </div>
-                          <div className="flex gap-4">
-                            <Button
-                              variant="outline"
-                              className="flex-1 text-xs"
-                              onClick={() => dispatch(clearRewardOption())}
-                            >
-                              Cancel
-                            </Button>
-                            <Button
-                              className="flex-1 text-xs bg-primary hover:bg-primary/90 text-white"
-                              disabled={bonusSaveDisabled}
-                              onClick={() => dispatch(saveRewardOption())}
-                            >
-                              Save
-                            </Button>
-                          </div>
+                          <Input
+                            ref={bonusInputRef}
+                            type="number"
+                            placeholder="e.g. 50"
+                            value={bonusVal}
+                            onChange={(e) => dispatch(setBonusVal(e.target.value))}
+                            className="h-8 pl-10 text-sm focus-visible:ring-1 focus-visible:ring-primary"
+                          />
                         </div>
-                      )}
+                      </div>
+                    )}
                   </div>
                 );
               })}
             </CommandList>
+
+            {/* Cancel / Save always at the bottom of the list */}
+            {showBonusInput && (
+              <div className="flex gap-4 p-3">
+                <Button
+                  variant="outline"
+                  className="flex-1 text-xs"
+                  onClick={() => dispatch(clearRewardOption())}
+                >
+                  Cancel
+                </Button>
+                <Button
+                  className="flex-1 text-xs bg-primary hover:bg-primary/90 text-white"
+                  disabled={bonusSaveDisabled}
+                  onClick={() => dispatch(saveRewardOption())}
+                >
+                  Save
+                </Button>
+              </div>
+            )}
           </Command>
         </PopoverContent>
       </Popover>
 
-      {/* CommissionTierDialog  */}
       <CommissionTierDialog />
     </div>
   );

@@ -16,10 +16,9 @@ const Navbar = () => {
           <NotificationDropdown />
 
           {/* User profile */}
-          <NavUserProfile user={{ name: "Chirag Sonar", email: "chirag@example.com", avatar: "https://github.com/shadcn.png" }} />
+          <NavUserProfile user={{ name: "Chirag Sonar", email: "chirag@getsaral.com", avatar: "https://github.com/shadcn.png" }} />
         </div>
       </div>
-      {/* </div> */}
     </nav>
   )
 }

@@ -1,5 +1,5 @@
-import { useState } from "react";
-import { Calendar1 } from "lucide-react";
+import { useEffect, useRef, useState } from "react";
+import { Calendar1, Loader2 } from "lucide-react";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import { Button } from "@/components/ui/button";
 import { Switch } from "@/components/ui/switch";
@@ -8,6 +8,7 @@ import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover
 import { cn } from "@/lib/utils";
 import { useAppDispatch, useAppSelector } from "@/store/store";
 import { closeModal, setTimeBound, setSelectedDate, } from "@/store/rewardSlice";
+import { toast } from "sonner";
 import { RewardEventSelect } from "@/components/features/dashboard/RewardeventSelect";
 import { RewardWithSelect } from "@/components/features/dashboard/RewardwithSelect";
 import { Label } from "@/components/ui/label";
@@ -23,6 +24,8 @@ export function RewardSystemModal() {
         selectedDate,
     } = useAppSelector((s) => s.reward);
     const [datePickerOpen, setDatePickerOpen] = useState(false);
+    const [isCreating, setIsCreating] = useState(false);
+    const createTimeoutRef = useRef<number | null>(null);
 
     const canCreate =
         eventSaved && rewardSaved && (!timeBound || !!selectedDate);
@@ -51,6 +54,18 @@ export function RewardSystemModal() {
     const tomorrow = new Date();
     tomorrow.setDate(tomorrow.getDate() + 1);
 
+    const today = new Date();
+    const startOfCurrentMonth = new Date(today.getFullYear(), today.getMonth(), 1);
+
+    useEffect(() => {
+        return () => {
+            if (createTimeoutRef.current !== null) {
+                window.clearTimeout(createTimeoutRef.current);
+                createTimeoutRef.current = null;
+            }
+        };
+    }, []);
+
     const handleDateSelect = (date: Date | undefined) => {
         if (!date) return;
         dispatch(
@@ -63,12 +78,33 @@ export function RewardSystemModal() {
     };
 
     const handleCreate = () => {
-        // Fire your API call or further action here before closing
-        dispatch(closeModal());
+        if (!canCreate || isCreating) return;
+
+        setIsCreating(true);
+        createTimeoutRef.current = window.setTimeout(() => {
+            dispatch(closeModal());
+            toast.success("Reward created successfully", { position: "top-center" });
+            setIsCreating(false);
+            createTimeoutRef.current = null;
+        }, 600);
     };
 
+    const dialogTooltip = isCreating ? "Creating reward..." : tooltipMessage;
+
     return (
-        <Dialog open={isOpen} onOpenChange={(open) => !open && dispatch(closeModal())}>
+        <Dialog
+            open={isOpen}
+            onOpenChange={(open) => {
+                if (!open) {
+                    dispatch(closeModal());
+                    setIsCreating(false);
+                    if (createTimeoutRef.current !== null) {
+                        window.clearTimeout(createTimeoutRef.current);
+                        createTimeoutRef.current = null;
+                    }
+                }
+            }}
+        >
             <DialogContent
                 className="sm:max-w-100 gap-0 p-0 overflow-hidden"
                 showCloseButton
@@ -152,8 +188,9 @@ export function RewardSystemModal() {
                                             handleDateSelect(date);
                                             setDatePickerOpen(false);
                                         }}
+                                        startMonth={startOfCurrentMonth}
                                         disabled={{ before: tomorrow }}
-                                        className="rounded-md p-1 w-71 **:[[role=gridcell]]:w-full **:[[role=gridcell]]:h-full"
+                                        className="rounded-md p-1.5 w-75 **:[[role=gridcell]]:w-full **:[[role=gridcell]]:h-full"
                                         classNames={{
                                             selected:
                                                 "bg-primary text-white hover:bg-primary/90 focus:bg-primary/90",
@@ -178,14 +215,21 @@ export function RewardSystemModal() {
                     <TooltipWrapper
                         side="bottom"
                         className="w-full"
-                        tooltip={tooltipMessage}
+                        tooltip={dialogTooltip}
                     >
                         <Button
                             className="w-full"
-                            disabled={!canCreate}
+                            disabled={!canCreate || isCreating}
                             onClick={handleCreate}
                         >
-                            Create Reward
+                            {isCreating ? (
+                                <>
+                                    <Loader2 className="size-4 mr-2 animate-spin" />
+                                    Creating...
+                                </>
+                            ) : (
+                                "Create Reward"
+                            )}
                         </Button>
                     </TooltipWrapper>
                 </div>

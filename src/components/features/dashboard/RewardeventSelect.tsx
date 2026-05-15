@@ -61,15 +61,18 @@ export function RewardEventSelect() {
     const salesSaveDisabled = !salesVal || Number(salesVal) <= 0;
     const postsSaveDisabled = !postsX || !postsY || Number(postsX) <= 0;
 
-    // Trigger label logic:
-    // - Nothing selected yet: placeholder
-    // - Option selected but not saved: show the option's raw label (e.g. "Cross $X in sales")
-    // - Saved: show the resolved label (e.g. "Cross $100 in sales")
     const triggerLabel = !eventKey
         ? null
         : eventSaved
             ? eventLabel
             : EVENT_OPTIONS.find((o) => o.key === eventKey)?.label ?? null;
+
+    // Show inline inputs + footer buttons only when an option needing input is selected but not saved
+    const showSalesInput = eventKey === "sales" && !eventSaved;
+    const showPostsInput = eventKey === "posts" && !eventSaved;
+    const showFooter = showSalesInput || showPostsInput;
+
+    const footerSaveDisabled = showSalesInput ? salesSaveDisabled : postsSaveDisabled;
 
     return (
         <Popover
@@ -105,15 +108,12 @@ export function RewardEventSelect() {
                 sideOffset={0}
             >
                 <Command>
-                    {/* Suppress default CommandInput filtering - we don't need a search bar */}
                     <CommandList className="max-h-none">
                         {EVENT_OPTIONS.map((opt) => (
                             <div key={opt.key}>
                                 <CommandItem
                                     value={opt.key ?? ""}
-                                    // preventDefault stops Command from closing the Popover on select
                                     onSelect={() => {
-                                        // If already saved with this key, just close
                                         if (eventSaved && eventKey === opt.key) {
                                             dispatch(closeEventDrop());
                                             return;
@@ -123,7 +123,7 @@ export function RewardEventSelect() {
                                     className={cn(
                                         "px-3 py-2 cursor-pointer text-sm mb-1",
                                         "data-[selected=true]:bg-accent hover:text-primary",
-                                        eventKey === opt.key && "text-primary"
+                                        eventKey === opt.key && "text-primary bg-accent",
                                     )}
                                 >
                                     <p>{opt.label}</p>
@@ -134,109 +134,88 @@ export function RewardEventSelect() {
                                     </CommandShortcut>
                                 </CommandItem>
 
-                                {/* Inline input for "sales" - shown when selected but not yet saved */}
-                                {opt.key === "sales" &&
-                                    eventKey === "sales" &&
-                                    !eventSaved && (
-                                        <div className="bg-muted/40 px-3 pb-3 pt-1 space-y-2">
-                                            <div className="relative">
-                                                <div className="flex items-center justify-center h-7.5 w-fit -translate-y-1/2 absolute top-1/2 left-0 px-2 border-r rounded-l border-gray-200">
-                                                    <DollarSign className="size-3.5 text-muted-foreground" />
-                                                </div>
-                                                <Input
-                                                    ref={salesInputRef}
-                                                    type="number"
-                                                    placeholder="e.g. 100"
-                                                    value={salesVal}
-                                                    onChange={(e) =>
-                                                        dispatch(setSalesVal(e.target.value))
-                                                    }
-                                                    className="h-8 pl-10 text-sm focus-visible:ring-1 focus-visible:ring-primary"
-                                                />
+                                {opt.key === "sales" && showSalesInput && (
+                                    <div className="bg-muted/40 px-3 pb-3 pt-1">
+                                        <div className="relative">
+                                            <div className="flex items-center justify-center h-7.5 w-fit -translate-y-1/2 absolute top-1/2 left-0 px-2 border-r rounded-l border-gray-200">
+                                                <DollarSign className="size-3.5 text-muted-foreground" />
                                             </div>
-                                            <div className="flex gap-4">
-                                                <Button
-                                                    variant="outline"
-                                                    size="default"
-                                                    className="flex-1 text-xs"
-                                                    onClick={() => dispatch(clearEventOption())}
-                                                >
-                                                    Cancel
-                                                </Button>
-                                                <Button
-                                                    size="default"
-                                                    className="flex-1 text-xs bg-primary hover:bg-primary/90 text-white"
-                                                    disabled={salesSaveDisabled}
-                                                    onClick={() => dispatch(saveEventOption())}
-                                                >
-                                                    Save
-                                                </Button>
-                                            </div>
+                                            <Input
+                                                ref={salesInputRef}
+                                                type="number"
+                                                placeholder="e.g. 100"
+                                                value={salesVal}
+                                                onChange={(e) => dispatch(setSalesVal(e.target.value))}
+                                                className="h-8 pl-10 text-sm focus-visible:ring-1 focus-visible:ring-primary"
+                                            />
                                         </div>
-                                    )}
+                                    </div>
+                                )}
 
-                                {/* Inline inputs for "posts" */}
-                                {opt.key === "posts" &&
-                                    eventKey === "posts" &&
-                                    !eventSaved && (
-                                        <div className="bg-muted/40 px-3 pb-3 pt-1 space-y-2">
-                                            <div className="flex gap-2">
-                                                <Input
-                                                    ref={postsXInputRef}
-                                                    type="number"
-                                                    placeholder="X posts"
-                                                    value={postsX}
-                                                    onChange={(e) =>
-                                                        dispatch(setPostsX(e.target.value))
-                                                    }
-                                                    className="h-8 text-sm focus-visible:ring-1 focus-visible:ring-primary"
-                                                />
-                                                <DropdownMenu>
-                                                    <DropdownMenuTrigger asChild>
-                                                        <Button
-                                                            variant="outline"
-                                                            className="h-8 min-w-35 justify-between px-3 text-sm text-muted-foreground"
+                                {opt.key === "posts" && showPostsInput && (
+                                    <div className="bg-muted/40 px-3 pb-3 pt-1">
+                                        <div className="flex gap-2 w-full">
+                                            <Input
+                                                ref={postsXInputRef}
+                                                type="number"
+                                                placeholder="X posts"
+                                                value={postsX}
+                                                onChange={(e) => dispatch(setPostsX(e.target.value))}
+                                                className="h-8 w-1/2 text-sm focus-visible:ring-1 focus-visible:ring-primary"
+                                            />
+                                            <DropdownMenu>
+                                                <DropdownMenuTrigger asChild className="w-1/2">
+                                                    <Button
+                                                        variant="outline"
+                                                        className={cn(
+                                                            "h-8 justify-between px-3 text-sm",
+                                                            !postsY && "text-muted-foreground"
+                                                        )}
+                                                    >
+                                                        {postsY || "Select duration"}
+                                                        <ChevronDown className="size-4" />
+                                                    </Button>
+                                                </DropdownMenuTrigger>
+                                                <DropdownMenuContent align="center" className="w-40.5">
+                                                    {POST_INTERVAL_OPTIONS.map((option) => (
+                                                        <DropdownMenuItem
+                                                            key={option}
+                                                            className="cursor-pointer"
+                                                            onSelect={() => dispatch(setPostsY(option))}
                                                         >
-                                                            {postsY || "Select duration"}
-                                                            <ChevronDown className="w-4 h-4" />
-                                                        </Button>
-                                                    </DropdownMenuTrigger>
-                                                    <DropdownMenuContent className="w-52">
-                                                        {POST_INTERVAL_OPTIONS.map((option) => (
-                                                            <DropdownMenuItem
-                                                                key={option}
-                                                                className="cursor-pointer"
-                                                                onSelect={() => dispatch(setPostsY(option))}
-                                                            >
-                                                                {option}
-                                                            </DropdownMenuItem>
-                                                        ))}
-                                                    </DropdownMenuContent>
-                                                </DropdownMenu>
-                                            </div>
-                                            <div className="flex gap-4">
-                                                <Button
-                                                    variant="outline"
-                                                    size="sm"
-                                                    className="flex-1 h-7 text-xs"
-                                                    onClick={() => dispatch(clearEventOption())}
-                                                >
-                                                    Cancel
-                                                </Button>
-                                                <Button
-                                                    size="sm"
-                                                    className="flex-1 h-7 text-xs bg-primary hover:bg-primary/90 text-white"
-                                                    disabled={postsSaveDisabled}
-                                                    onClick={() => dispatch(saveEventOption())}
-                                                >
-                                                    Save
-                                                </Button>
-                                            </div>
+                                                            {option}
+                                                        </DropdownMenuItem>
+                                                    ))}
+                                                </DropdownMenuContent>
+                                            </DropdownMenu>
                                         </div>
-                                    )}
+                                    </div>
+                                )}
                             </div>
                         ))}
                     </CommandList>
+
+                    {/* Shared Footer */}
+                    {showFooter && (
+                        <div className="flex gap-2 p-3">
+                            <Button
+                                variant="outline"
+                                size="default"
+                                className="flex-1 text-xs"
+                                onClick={() => dispatch(clearEventOption())}
+                            >
+                                Cancel
+                            </Button>
+                            <Button
+                                size="default"
+                                className="flex-1 text-xs bg-primary hover:bg-primary/90 text-white"
+                                disabled={footerSaveDisabled}
+                                onClick={() => dispatch(saveEventOption())}
+                            >
+                                Save
+                            </Button>
+                        </div>
+                    )}
                 </Command>
             </PopoverContent>
         </Popover>

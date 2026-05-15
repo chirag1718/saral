@@ -11,7 +11,7 @@ import {
     SidebarRail,
     useSidebar,
 } from "@/components/ui/sidebar"
-import { Home, Brain, BriefcaseBusiness, ClipboardList, Wallet, User } from "lucide-react"
+import { Home, Brain, BriefcaseBusiness, ClipboardList, Wallet, User, ChevronsUpDown } from "lucide-react"
 import { Separator } from "../ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 
@@ -29,21 +29,26 @@ export function AppSidebar() {
 
     return (
         <Sidebar collapsible="icon">
-            <SidebarHeader>
+            <SidebarHeader className="p-1.5">
                 <div
-                    className={`flex items-center justify-normal ${isCollapsed ? "" : "gap-4"
+                    className={`flex items-start justify-normal ${isCollapsed ? "" : "gap-4"
                         }`}
                 >
-                    <Avatar className="size-8!">
-                        <AvatarImage src="https://github.com/shadcn.png" />
+                    <Avatar className="size-9!">
+                        <AvatarImage src="./dashboard/getsaral_logo.jpg" />
                         <AvatarFallback>CN</AvatarFallback>
                     </Avatar>
                     {!isCollapsed && (
-                        <p className="text-lg font-semibold shrink-0">Chirag Sonar</p>
+                        <div className="flex flex-col gap-0.5 items-start justify-normal">
+                            <p className="text-lg font-semibold shrink-0">Chirag Sonar</p>
+                            <p className="text-xs font-semibold shrink-0 text-muted-foreground">chirag@getsaral.com</p>
+                        </div>
                     )}
                 </div>
             </SidebarHeader>
+
             <Separator className="bg-primary/20 h-1 w-full" />
+
             <SidebarContent>
                 <SidebarGroup>
                     <SidebarGroupContent>
@@ -53,7 +58,7 @@ export function AppSidebar() {
                                     <SidebarMenuButton
                                         asChild
                                         isActive={item.label === "Gamification"}
-                                        className="focus:ring-1 focus:ring-primary/30 focus:text-primary focus:bg-white transition-colors duration-150"
+                                        className="focus:ring-1 focus:ring-primary/30 focus:text-primary focus:bg-white"
                                     >
                                         <a
                                             href={item.href}
@@ -77,6 +82,7 @@ export function AppSidebar() {
             </SidebarContent>
 
             <Separator className="bg-primary/20 h-1 w-full" />
+
             <SidebarFooter>
                 <SidebarMenu>
                     <SidebarMenuItem>
