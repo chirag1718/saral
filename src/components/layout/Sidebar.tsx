@@ -11,7 +11,7 @@ import {
     SidebarRail,
     useSidebar,
 } from "@/components/ui/sidebar"
-import { Home, Brain, BriefcaseBusiness, ClipboardList, Wallet, User, ChevronsUpDown } from "lucide-react"
+import { Home, Brain, BriefcaseBusiness, ClipboardList, Wallet, User } from "lucide-react"
 import { Separator } from "../ui/separator"
 import { Avatar, AvatarFallback, AvatarImage } from "../ui/avatar"
 

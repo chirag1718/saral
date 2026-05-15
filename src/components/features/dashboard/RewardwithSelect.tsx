@@ -14,7 +14,6 @@ import {
   saveRewardOption,
   clearRewardOption,
   openCommissionTierDialog,
-  type RewardKey,
 } from "@/store/rewardSlice";
 import { CommissionTierDialog } from "./CommissionTierDialog";
 import { REWARD_OPTIONS } from "@/constants/rewardOptions";

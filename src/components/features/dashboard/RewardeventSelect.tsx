@@ -16,7 +16,6 @@ import {
     setPostsY,
     saveEventOption,
     clearEventOption,
-    type EventKey,
 } from "@/store/rewardSlice";
 import { EVENT_OPTIONS } from "@/constants/rewardOptions";
 
