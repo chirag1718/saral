@@ -17,11 +17,9 @@ import {
   type RewardKey,
 } from "@/store/rewardSlice";
 import { CommissionTierDialog } from "./CommissionTierDialog";
+import { REWARD_OPTIONS } from "@/constants/rewardOptions";
 
-const REWARD_OPTIONS: { key: RewardKey; label: string }[] = [
-  { key: "bonus", label: "Flat $X bonus" },
-  { key: "commission", label: "Upgrade to commission tier" },
-];
+
 
 export function RewardWithSelect() {
   const dispatch = useAppDispatch();

@@ -18,12 +18,8 @@ import {
     clearEventOption,
     type EventKey,
 } from "@/store/rewardSlice";
+import { EVENT_OPTIONS } from "@/constants/rewardOptions";
 
-const EVENT_OPTIONS: { key: EventKey; label: string }[] = [
-    { key: "sales", label: "Cross $X in sales" },
-    { key: "posts", label: "Posts X times every Y period" },
-    { key: "onboard", label: "Is Onboarded" },
-];
 
 export function RewardEventSelect() {
     const dispatch = useAppDispatch();

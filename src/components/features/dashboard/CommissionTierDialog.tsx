@@ -16,8 +16,7 @@ import {
     saveCommissionTier,
 } from "@/store/rewardSlice";
 import { Label } from "@/components/ui/label";
-
-const TIER_OPTIONS = ["Bronze", "Silver", "Gold", "Platinum"];
+import { TIER_OPTIONS } from "@/constants/rewardOptions";
 
 export function CommissionTierDialog() {
     const dispatch = useAppDispatch();
