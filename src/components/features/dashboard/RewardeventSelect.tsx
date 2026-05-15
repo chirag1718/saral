@@ -122,7 +122,7 @@ export function RewardEventSelect() {
                                     }}
                                     className={cn(
                                         "px-3 py-2 cursor-pointer text-sm mb-1",
-                                        "data-[selected=true]:bg-accent",
+                                        "data-[selected=true]:bg-accent hover:text-primary",
                                         eventKey === opt.key && "text-primary"
                                     )}
                                 >
@@ -140,7 +140,9 @@ export function RewardEventSelect() {
                                     !eventSaved && (
                                         <div className="bg-muted/40 px-3 pb-3 pt-1 space-y-2">
                                             <div className="relative">
-                                                <DollarSign className="-translate-y-1/2 absolute top-1/2 left-3 size-3.5 mt-px text-muted-foreground" />
+                                                <div className="flex items-center justify-center h-7.5 w-fit -translate-y-1/2 absolute top-1/2 left-0 px-2 border-r rounded-l border-gray-200">
+                                                    <DollarSign className="size-3.5 text-muted-foreground" />
+                                                </div>
                                                 <Input
                                                     ref={salesInputRef}
                                                     type="number"
@@ -149,10 +151,10 @@ export function RewardEventSelect() {
                                                     onChange={(e) =>
                                                         dispatch(setSalesVal(e.target.value))
                                                     }
-                                                    className="h-8 pl-7 text-sm focus-visible:ring-1 focus-visible:ring-primary"
+                                                    className="h-8 pl-10 text-sm focus-visible:ring-1 focus-visible:ring-primary"
                                                 />
                                             </div>
-                                            <div className="flex gap-2">
+                                            <div className="flex gap-4">
                                                 <Button
                                                     variant="outline"
                                                     size="default"
@@ -179,7 +181,7 @@ export function RewardEventSelect() {
                                     !eventSaved && (
                                         <div className="bg-muted/40 px-3 pb-3 pt-1 space-y-2">
                                             <div className="flex gap-2">
-                                                        <Input
+                                                <Input
                                                     ref={postsXInputRef}
                                                     type="number"
                                                     placeholder="X posts"
@@ -212,7 +214,7 @@ export function RewardEventSelect() {
                                                     </DropdownMenuContent>
                                                 </DropdownMenu>
                                             </div>
-                                            <div className="flex gap-2">
+                                            <div className="flex gap-4">
                                                 <Button
                                                     variant="outline"
                                                     size="sm"

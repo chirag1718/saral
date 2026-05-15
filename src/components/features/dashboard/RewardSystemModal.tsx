@@ -74,14 +74,14 @@ export function RewardSystemModal() {
                 showCloseButton
             >
                 {/* Header */}
-                <DialogHeader className="px-5 pt-5 pb-4 flex flex-row items-center justify-between space-y-0 border-b">
+                <DialogHeader className="px-6 pt-6 pb-4 flex flex-row items-center justify-between space-y-0">
                     <DialogTitle className="text-base font-medium text-black">
                         Create your reward system
                     </DialogTitle>
                 </DialogHeader>
 
                 {/* Body */}
-                <div className="px-5 py-4 space-y-4">
+                <div className="px-6 pb-6 space-y-4">
                     {/* Reward event */}
                     <div className="space-y-1.5">
                         <Label className="text-xs text-muted-foreground">
@@ -167,7 +167,7 @@ export function RewardSystemModal() {
                 </div>
 
                 {/* Footer */}
-                <div className="px-5 py-4 border-t flex gap-2 w-full">
+                <div className="px-6 pb-6 flex gap-4 w-full">
                     <Button
                         variant="outline"
                         className="w-1/2"

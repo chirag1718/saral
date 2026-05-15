@@ -1,5 +1,5 @@
 import { useRef, useEffect } from "react";
-import { Check, ChevronDown, DollarSign, Edit } from "lucide-react";
+import { Check, ChevronDown, DollarSign, Pencil } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandList, CommandItem, CommandShortcut } from "@/components/ui/command";
 import { Button } from "@/components/ui/button";
@@ -43,10 +43,10 @@ export function RewardWithSelect() {
 
   const bonusSaveDisabled = !bonusVal || Number(bonusVal) <= 0;
 
-  // Same three-state label logic as RewardEventSelect:
-  // no selection -> placeholder
-  // selected, not saved -> raw option label e.g. "Flat $X bonus"
-  // saved -> resolved label e.g. "Flat $50 bonus"
+  // Three-state trigger label:
+  // null key          -> placeholder
+  // key set, unsaved  -> raw option label
+  // saved             -> resolved label from slice (e.g. "Upgrade to Bronze tier")
   const triggerLabel = !rewardKey
     ? null
     : rewardSaved
@@ -90,10 +90,19 @@ export function RewardWithSelect() {
           <Command>
             <CommandList className="max-h-none">
               {REWARD_OPTIONS.map((opt) => {
-                const optionLabel =
+                // For commission, show the saved label in the list once saved
+                const listLabel =
                   opt.key === "commission" && rewardSaved && rewardKey === "commission"
                     ? rewardLabel
                     : opt.label;
+
+                // A checkmark should show when this option is the saved selection.
+                // For commission: rewardKey === "commission" AND rewardSaved.
+                // For bonus: rewardKey === "bonus" (saved check is implicitly
+                //   handled by the inline input being hidden when rewardSaved).
+                const isSelected =
+                  rewardKey === opt.key &&
+                  (opt.key === "commission" ? rewardSaved : true);
 
                 return (
                   <div key={opt.key}>
@@ -101,10 +110,13 @@ export function RewardWithSelect() {
                       value={opt.key ?? ""}
                       onSelect={() => {
                         if (opt.key === "commission") {
+                          // Always open the tier dialog for commission -
+                          // whether first time or editing
                           dispatch(closeRewardDrop());
                           dispatch(openCommissionTierDialog());
                           return;
                         }
+                        // Bonus: if already saved with this key, just close
                         if (rewardSaved && rewardKey === opt.key) {
                           dispatch(closeRewardDrop());
                           return;
@@ -112,29 +124,37 @@ export function RewardWithSelect() {
                         dispatch(selectRewardOption(opt.key));
                       }}
                       className={cn(
-                        "px-3 py-2 cursor-pointer text-sm mb-1 relative group",
-                        "data-[selected=true]:bg-accent",
-                        rewardKey === opt.key && "text-primary"
+                        "px-3 py-2 cursor-pointer text-sm mb-1 group",
+                        "data-[selected=true]:bg-accent hover:text-primary",
+                        isSelected && "text-primary"
                       )}
                     >
-                      <p>{optionLabel}</p>
-                      <CommandShortcut>
-                        {rewardKey === opt.key && (
+                      <div className="flex items-center justify-normal gap-1">
+                        <p>{listLabel}</p>
+                        {/* Edit icon for commission on hover when saved */}
+                        {opt.key === "commission" &&
+                          rewardSaved &&
+                          rewardKey === "commission" && (
+                            <Pencil className="size-3.5 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity ml-1" />
+                          )}
+                      </div>
+                      <CommandShortcut className="flex items-center justify-end gap-2">
+                        {/* Checkmark for selected option */}
+                        {isSelected && (
                           <Check className="size-4 text-primary" />
-                        )}
-                        {opt.key === "commission" && rewardSaved && rewardKey === "commission" && (
-                          <Edit className="size-4 text-muted-foreground opacity-0 group-hover:opacity-100 transition-opacity" />
                         )}
                       </CommandShortcut>
                     </CommandItem>
 
-                    {/* Inline input for "bonus" */}
+                    {/* Inline input for "bonus" only */}
                     {opt.key === "bonus" &&
                       rewardKey === "bonus" &&
                       !rewardSaved && (
                         <div className="bg-muted/40 px-3 pb-3 pt-1 space-y-2">
                           <div className="relative">
-                            <DollarSign className="-translate-y-1/2 absolute top-1/2 left-3 size-3.5 mt-px text-muted-foreground" />
+                            <div className="flex items-center justify-center h-7.5 w-fit -translate-y-1/2 absolute top-1/2 left-0 px-2 border-r rounded-l border-gray-200">
+                              <DollarSign className="size-3.5 text-muted-foreground" />
+                            </div>
                             <Input
                               ref={bonusInputRef}
                               type="number"
@@ -143,20 +163,18 @@ export function RewardWithSelect() {
                               onChange={(e) =>
                                 dispatch(setBonusVal(e.target.value))
                               }
-                              className="h-8 pl-7 text-sm focus-visible:ring-1 focus-visible:ring-primary"
+                              className="h-8 pl-10 text-sm focus-visible:ring-1 focus-visible:ring-primary"
                             />
                           </div>
-                          <div className="flex gap-2">
+                          <div className="flex gap-4">
                             <Button
                               variant="outline"
-                              size="default"
                               className="flex-1 text-xs"
                               onClick={() => dispatch(clearRewardOption())}
                             >
                               Cancel
                             </Button>
                             <Button
-                              size="default"
                               className="flex-1 text-xs bg-primary hover:bg-primary/90 text-white"
                               disabled={bonusSaveDisabled}
                               onClick={() => dispatch(saveRewardOption())}
@@ -173,6 +191,8 @@ export function RewardWithSelect() {
           </Command>
         </PopoverContent>
       </Popover>
+
+      {/* CommissionTierDialog  */}
       <CommissionTierDialog />
     </div>
   );
