@@ -108,7 +108,7 @@ const rewardSlice = createSlice({
         state.eventSaved = true;
         state.eventDropOpen = false;
       } else if (state.eventKey === "posts" && state.postsX && state.postsY) {
-        state.eventLabel = `Posts ${state.postsX} times every ${state.postsY} week(s)`;
+        state.eventLabel = `Posts ${state.postsX} times every ${state.postsY}`;
         state.eventSaved = true;
         state.eventDropOpen = false;
       }

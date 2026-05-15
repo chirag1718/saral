@@ -33,15 +33,15 @@ export function RewardSystemModal() {
 
     const tooltipMessage = !canCreate
         ? isEventMissing && isRewardMissing
-            ? "Choose a reward trigger and a reward to continue"
+            ? "Choose a reward event and a reward to continue"
             : isEventMissing
-                ? "Choose a reward trigger to continue"
+                ? "Choose a reward event to continue"
                 : isRewardMissing
                     ? "Choose a reward to continue"
                     : isEndDateMissing
                         ? "Choose reward end date to continue"
                         : "Complete all required fields to continue"
-        : "Craete reward";
+        : "Create reward";
 
     // Convert our SelectedDate shape to/from JS Date for shadcn Calendar
     const calendarDate: Date | undefined = selectedDate

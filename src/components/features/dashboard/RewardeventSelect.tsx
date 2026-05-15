@@ -1,208 +1,8 @@
-// import { useRef, useEffect } from "react";
-// import { Check, ChevronDown, DollarSign } from "lucide-react";
-// import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
-// import { Command, CommandList, CommandItem, CommandShortcut } from "@/components/ui/command";
-// import { Button } from "@/components/ui/button";
-// import { Input } from "@/components/ui/input";
-// import { cn } from "@/lib/utils";
-// import { useAppDispatch, useAppSelector } from "@/store/store";
-// import {
-//     toggleEventDrop,
-//     closeEventDrop,
-//     selectEventOption,
-//     setSalesVal,
-//     setPostsX,
-//     setPostsY,
-//     saveEventOption,
-//     clearEventOption,
-//     type EventKey,
-// } from "@/store/rewardSlice";
-
-// const EVENT_OPTIONS: { key: EventKey; label: string }[] = [
-//     { key: "sales", label: "Cross $X in sales" },
-//     { key: "posts", label: "Posts X times every Y period" },
-//     { key: "onboard", label: "Is Onboarded" },
-// ];
-
-// export function RewardEventSelect() {
-//     const dispatch = useAppDispatch();
-//     const {
-//         eventKey,
-//         eventLabel,
-//         eventSaved,
-//         eventDropOpen,
-//         salesVal,
-//         postsX,
-//         postsY,
-//     } = useAppSelector((s) => s.reward);
-
-//     const salesInputRef = useRef<HTMLInputElement>(null);
-//     const postsXInputRef = useRef<HTMLInputElement>(null);
-
-//     // Auto-focus inline input when option is selected
-//     useEffect(() => {
-//         if (eventKey === "sales" && !eventSaved) {
-//             setTimeout(() => salesInputRef.current?.focus(), 50);
-//         }
-//         if (eventKey === "posts" && !eventSaved) {
-//             setTimeout(() => postsXInputRef.current?.focus(), 50);
-//         }
-//     }, [eventKey, eventSaved]);
-
-//     const salesSaveDisabled = !salesVal || Number(salesVal) <= 0;
-//     const postsSaveDisabled = !postsX || !postsY || Number(postsX) <= 0;
-
-//     return (
-//         <Popover
-//             open={eventDropOpen}
-//             onOpenChange={(open) => {
-//                 if (!open) dispatch(closeEventDrop());
-//             }}
-//         >
-//             <PopoverTrigger asChild>
-//                 <Button
-//                     onClick={() => dispatch(toggleEventDrop())}
-//                     className={cn(
-//                         "w-full flex items-center justify-between px-3 py-2 text-sm rounded-md border transition-colors",
-//                         "bg-background hover:bg-accent/30",
-//                         eventDropOpen
-//                             ? "border-primary"
-//                             : "border-border",
-//                         eventSaved ? "text-foreground" : "text-muted-foreground"
-//                     )}
-//                 >
-//                     <span>{eventSaved ? eventLabel : "Select an event"}</span>
-//                     <ChevronDown
-//                         className={cn(
-//                             "w-4 h-4 transition-transform",
-//                             eventDropOpen && "rotate-180"
-//                         )}
-//                     />
-//                 </Button>
-//             </PopoverTrigger>
-
-//             <PopoverContent
-//                 className="w-89.5 p-0 border-primary mt-0 shadow-md"
-//                 align="center"
-//                 sideOffset={0}
-//             >
-//                 <Command>
-//                     <CommandList className="max-h-none">
-//                         {EVENT_OPTIONS.map((opt) => (
-//                             <div key={opt.key} >
-//                                 <CommandItem
-//                                     value={opt.key ?? ""}
-//                                     onSelect={() => dispatch(selectEventOption(opt.key))}
-//                                     className={cn(
-//                                         "px-3 py-2 cursor-pointer text-sm mb-1 data-selected:bg-accent data-selected:text-primary",
-//                                     )}
-//                                 >
-//                                     <p className="">{opt.label}</p>
-//                                     <CommandShortcut>
-//                                         {eventKey === opt.key && (
-//                                             <Check className="size-4" />
-//                                         )}
-//                                     </CommandShortcut>
-//                                 </CommandItem>
-
-//                                 {/* Inline input for "sales" */}
-//                                 {opt.key === "sales" &&
-//                                     eventKey === "sales" &&
-//                                     !eventSaved && (
-//                                         <div className="bg-muted/40 px-3 pb-3 pt-1 space-y-2">
-//                                             <div className="relative">
-//                                                 <DollarSign className="-translate-y-1/2 absolute top-1/2 left-3 size-3.5 mt-px text-muted-foreground" />
-//                                                 <Input
-//                                                     ref={salesInputRef}
-//                                                     type="number"
-//                                                     placeholder="e.g. 100"
-//                                                     value={salesVal}
-//                                                     onChange={(e) =>
-//                                                         dispatch(setSalesVal(e.target.value))
-//                                                     }
-//                                                     className="h-8 pl-7 text-sm focus-visible:ring-1 focus-visible:ring-primary"
-//                                                 />
-//                                             </div>
-//                                             <div className="flex gap-2">
-//                                                 <Button
-//                                                     variant="outline"
-//                                                     size="sm"
-//                                                     className="flex-1 h-7 text-xs"
-//                                                     onClick={() => dispatch(clearEventOption())}
-//                                                 >
-//                                                     Cancel
-//                                                 </Button>
-//                                                 <Button
-//                                                     size="sm"
-//                                                     className="flex-1 h-7 text-xs bg-primary hover:bg-primary/90 text-white"
-//                                                     disabled={salesSaveDisabled}
-//                                                     onClick={() => dispatch(saveEventOption())}
-//                                                 >
-//                                                     Save
-//                                                 </Button>
-//                                             </div>
-//                                         </div>
-//                                     )}
-
-//                                 {/* Inline inputs for "posts" */}
-//                                 {opt.key === "posts" &&
-//                                     eventKey === "posts" &&
-//                                     !eventSaved && (
-//                                         <div className="bg-muted/40 px-3 pb-3 pt-1 space-y-2">
-//                                             <div className="flex gap-2">
-//                                                 <Input
-//                                                     ref={postsXInputRef}
-//                                                     type="number"
-//                                                     placeholder="X posts"
-//                                                     value={postsX}
-//                                                     onChange={(e) =>
-//                                                         dispatch(setPostsX(e.target.value))
-//                                                     }
-//                                                     className="h-8 text-sm focus-visible:ring-primary"
-//                                                 />
-//                                                 <Input
-//                                                     type="text"
-//                                                     placeholder="period (e.g. week)"
-//                                                     value={postsY}
-//                                                     onChange={(e) =>
-//                                                         dispatch(setPostsY(e.target.value))
-//                                                     }
-//                                                     className="h-8 text-sm focus-visible:ring-primary"
-//                                                 />
-//                                             </div>
-//                                             <div className="flex gap-2">
-//                                                 <Button
-//                                                     variant="outline"
-//                                                     size="sm"
-//                                                     className="flex-1 h-7 text-xs"
-//                                                     onClick={() => dispatch(clearEventOption())}
-//                                                 >
-//                                                     Cancel
-//                                                 </Button>
-//                                                 <Button
-//                                                     size="sm"
-//                                                     className="flex-1 h-7 text-xs bg-primary hover:bg-primary/90 text-white"
-//                                                     disabled={postsSaveDisabled}
-//                                                     onClick={() => dispatch(saveEventOption())}
-//                                                 >
-//                                                     Save
-//                                                 </Button>
-//                                             </div>
-//                                         </div>
-//                                     )}
-//                             </div>
-//                         ))}
-//                     </CommandList>
-//                 </Command>
-//             </PopoverContent>
-//         </Popover>
-//     );
-// }
-
 import { useRef, useEffect } from "react";
 import { Check, ChevronDown, DollarSign } from "lucide-react";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandList, CommandItem, CommandShortcut } from "@/components/ui/command";
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { cn } from "@/lib/utils";
@@ -248,6 +48,15 @@ export function RewardEventSelect() {
             setTimeout(() => postsXInputRef.current?.focus(), 50);
         }
     }, [eventKey, eventSaved]);
+
+    const POST_INTERVAL_OPTIONS = [
+        "14 days",
+        "1 month",
+        "2 months",
+        "3 months",
+        "6 months",
+        "1 year",
+    ] as const;
 
     const salesSaveDisabled = !salesVal || Number(salesVal) <= 0;
     const postsSaveDisabled = !postsX || !postsY || Number(postsX) <= 0;
@@ -303,7 +112,7 @@ export function RewardEventSelect() {
                                 <CommandItem
                                     value={opt.key ?? ""}
                                     // preventDefault stops Command from closing the Popover on select
-                                    onSelect={(e) => {
+                                    onSelect={() => {
                                         // If already saved with this key, just close
                                         if (eventSaved && eventKey === opt.key) {
                                             dispatch(closeEventDrop());
@@ -370,7 +179,7 @@ export function RewardEventSelect() {
                                     !eventSaved && (
                                         <div className="bg-muted/40 px-3 pb-3 pt-1 space-y-2">
                                             <div className="flex gap-2">
-                                                <Input
+                                                        <Input
                                                     ref={postsXInputRef}
                                                     type="number"
                                                     placeholder="X posts"
@@ -380,15 +189,28 @@ export function RewardEventSelect() {
                                                     }
                                                     className="h-8 text-sm focus-visible:ring-1 focus-visible:ring-primary"
                                                 />
-                                                <Input
-                                                    type="text"
-                                                    placeholder="period (e.g. week)"
-                                                    value={postsY}
-                                                    onChange={(e) =>
-                                                        dispatch(setPostsY(e.target.value))
-                                                    }
-                                                    className="h-8 text-sm focus-visible:ring-1 focus-visible:ring-primary"
-                                                />
+                                                <DropdownMenu>
+                                                    <DropdownMenuTrigger asChild>
+                                                        <Button
+                                                            variant="outline"
+                                                            className="h-8 min-w-35 justify-between px-3 text-sm text-muted-foreground"
+                                                        >
+                                                            {postsY || "Select duration"}
+                                                            <ChevronDown className="w-4 h-4" />
+                                                        </Button>
+                                                    </DropdownMenuTrigger>
+                                                    <DropdownMenuContent className="w-52">
+                                                        {POST_INTERVAL_OPTIONS.map((option) => (
+                                                            <DropdownMenuItem
+                                                                key={option}
+                                                                className="cursor-pointer"
+                                                                onSelect={() => dispatch(setPostsY(option))}
+                                                            >
+                                                                {option}
+                                                            </DropdownMenuItem>
+                                                        ))}
+                                                    </DropdownMenuContent>
+                                                </DropdownMenu>
                                             </div>
                                             <div className="flex gap-2">
                                                 <Button
